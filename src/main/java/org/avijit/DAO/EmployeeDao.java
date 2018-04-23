@@ -7,8 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.validation.Valid;
 import java.util.List;
 
 
@@ -23,6 +21,12 @@ public class EmployeeDao {
     public void saveEmployee(Employee employee) {
 
         em.persist(employee);
+    }
+
+
+    public Employee getEmployeeById(int id)
+    {
+        return em.find(Employee.class, id);
     }
 
     public boolean isAuthenticate(String userName, String password) {
@@ -45,7 +49,6 @@ public class EmployeeDao {
         } else {
             return false;
         }
-
     }
 
     public List<Employee> getAllMembers() {
@@ -67,6 +70,8 @@ public class EmployeeDao {
     }
 
     public void update(Employee employee) {
-        em.persist(employee);
+        em.merge(employee);
     }
+
+
 }

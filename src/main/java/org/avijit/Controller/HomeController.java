@@ -6,15 +6,18 @@ import org.avijit.Domain.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -26,10 +29,12 @@ public class HomeController {
     @Autowired
     EmployeeDao employeeDao;
 
-    @RequestMapping("/")
-    public String homePage() {
+
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String showLoginPage() {
         return "LoginPage";
     }
+
 
     @RequestMapping("/register")
     public String register(Model model) {
@@ -38,7 +43,7 @@ public class HomeController {
     }
 
     @RequestMapping(value = "/doRegistration", method = RequestMethod.POST)
-    public String doRegistration(@Valid @ModelAttribute("employee") Employee employee, BindingResult result, Model model) {
+    public String doRegistration(@Valid @ModelAttribute("employee") Employee employee, BindingResult result) {
 
 
         if (result.hasErrors()) {
@@ -85,12 +90,14 @@ public class HomeController {
 
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public String logoutPage(HttpServletRequest request, HttpServletResponse response) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Authentication auth = SecurityContextHolder.getContext()
+                .getAuthentication();
         if (auth != null) {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
-        return "redirect:/?logout";
+        return "redirect:/";
     }
+
 
     @RequestMapping(value = "/editEmployee/userName={userName}", method = RequestMethod.GET)
     public String editMember(@PathVariable("userName") String userName, Model model) {
@@ -102,10 +109,27 @@ public class HomeController {
 
 
     @RequestMapping(value = "/doUpdate", method = RequestMethod.POST)
-    public String doUpdate(Model model, @Valid Employee employee) {
-        employeeDao.update(employee);
-        List<Employee> list = employeeDao.getAllMembers();
-        model.addAttribute("list", list);
-        return "MemberList";
+    public String doUpdate(Model model, @Valid Employee employee, BindingResult result) {
+
+
+        Employee tempObj = employeeDao.getEmployeeById(employee.getId());
+
+        if (employee.getUserName().equals(tempObj.getUserName())) {
+            System.out.println("Inserting into if block !!");
+            employeeDao.update(employee);
+            List<Employee> list = employeeDao.getAllMembers();
+            model.addAttribute("list", list);
+            return "MemberList";
+        } else if (!employee.getUserName().equals(tempObj.getUserName()) && employeeDao.isExist(employee.getUserName())) {
+            System.out.println("Inserting into else if 1 block !!");
+            result.rejectValue("userName", "DuplicateKey.user.userName", "This username already exist! Try again !");
+            return "EditEmployee";
+        } else {
+            System.out.println("Inside else block !!");
+            employeeDao.update(employee);
+            List<Employee> list = employeeDao.getAllMembers();
+            model.addAttribute("list", list);
+            return "MemberList";
+        }
     }
 }

@@ -6,7 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="sf"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="sf" %>
 <html>
 <head>
     <title>Edit Employee</title>
@@ -45,6 +45,10 @@
             <div class="form-group">
                 <label class="col-md-4 control-label" for="name">Name</label>
                 <div class="col-md-4">
+
+                    <sf:input id="id" path="id" name="id" type="hidden"
+                              placeholder="id" class="form-control input-md"></sf:input>
+
                     <sf:input id="name" path="name" name="name" type="text"
                               placeholder="name" class="form-control input-md"></sf:input>
 
@@ -64,7 +68,6 @@
                     <sf:errors path="userName" cssClass="alert-danger"></sf:errors>
                 </div>
             </div>
-
 
 
             <!-- Text input-->
