@@ -51,17 +51,25 @@ public class EmployeeDao {
         }
     }
 
+
+
     public List<Employee> getAllMembers() {
         List<Employee> list = (List<Employee>) em.createQuery("FROM " + Employee.class.getName()).getResultList();
         return list;
     }
 
-    public void deleteMember(String userName) {
+//    public void deleteMember(String userName) {
+//
+//        Employee employee = (Employee) em.createQuery("FROM " + Employee.class.getName() + " WHERE userName=:userName").setParameter("userName", userName).getSingleResult();
+//        System.out.println(employee);
+//        em.remove(employee);
+//
+//    }
 
-        Employee employee = (Employee) em.createQuery("FROM " + Employee.class.getName() + " WHERE userName=:userName").setParameter("userName", userName).getSingleResult();
-        System.out.println(employee);
+    public  void deleteMember(int id)
+    {
+        Employee employee = em.find(Employee.class,id);
         em.remove(employee);
-
     }
 
     public Employee getEmployee(String userName) {

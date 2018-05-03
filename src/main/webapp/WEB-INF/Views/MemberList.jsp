@@ -35,6 +35,7 @@
     <div class="col-md-12 col-md-offset-3">
         <table class="table table-striped">
             <tr>
+                <th>ID</th>
                 <th>Name</th>
                 <th>User Name</th>
                 <th>Address</th>
@@ -45,6 +46,7 @@
             </tr>
             <c:forEach var="list" items="${list}">
                 <tr>
+                    <td><c:out value="${list.id}"></c:out></td>
                     <td><c:out value="${list.name}"></c:out></td>
                     <td><c:out value="${list.userName}"></c:out></td>
                     <td><c:out value="${list.address}"></c:out></td>
@@ -54,7 +56,7 @@
                     <td><a
                             href="${pageContext.request.contextPath}/editEmployee/userName=${list.userName}">Edit</a>
                         | <a href="#"
-                             onclick="confirmRemoveQuestion('${pageContext.request.contextPath}/deleteMember/userName=${list.userName}')">
+                             onclick="confirmRemoveQuestion('${pageContext.request.contextPath}/deleteMember/${list.id}')">
 
                             Delete</a>
                         <script>

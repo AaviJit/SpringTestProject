@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -80,12 +81,10 @@ public class HomeController {
         return "MemberList";
     }
 
-    @RequestMapping(value = "/deleteMember/userName={userName}", method = RequestMethod.GET)
-    public String deleteMember(@PathVariable("userName") String userName, Model model) {
-        employeeDao.deleteMember(userName);
-        List<Employee> list = employeeDao.getAllMembers();
-        model.addAttribute("list", list);
-        return "MemberList";
+    @RequestMapping(value = "/deleteMember/{id}", method = RequestMethod.GET)
+    public String deleteMember(@PathVariable("id") int id) {
+        employeeDao.deleteMember(id);
+        return "redirect:/memberList";
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
@@ -109,27 +108,24 @@ public class HomeController {
 
 
     @RequestMapping(value = "/doUpdate", method = RequestMethod.POST)
-    public String doUpdate(Model model, @Valid Employee employee, BindingResult result) {
+    public String doUpdate(Model model, @Valid final Employee employee, BindingResult result) {
 
 
-        Employee tempObj = employeeDao.getEmployeeById(employee.getId());
+        final Employee tempObj = employeeDao.getEmployeeById(employee.getId());
 
         if (employee.getUserName().equals(tempObj.getUserName())) {
-            System.out.println("Inserting into if block !!");
             employeeDao.update(employee);
-            List<Employee> list = employeeDao.getAllMembers();
-            model.addAttribute("list", list);
-            return "MemberList";
-        } else if (!employee.getUserName().equals(tempObj.getUserName()) && employeeDao.isExist(employee.getUserName())) {
-            System.out.println("Inserting into else if 1 block !!");
+            return "redirect:/memberList";
+        }
+
+        //!employee.getUserName().equals(tempObj.getUserName()) && employeeDao.isExist(employee.getUserName())
+
+        else if (employeeDao.getAllMembers().stream().filter(p-> !p.getUserName().equals(tempObj.getUserName()) && employee.getUserName().equals(p.getUserName())).collect(Collectors.toList()).size()>0) {
             result.rejectValue("userName", "DuplicateKey.user.userName", "This username already exist! Try again !");
             return "EditEmployee";
         } else {
-            System.out.println("Inside else block !!");
             employeeDao.update(employee);
-            List<Employee> list = employeeDao.getAllMembers();
-            model.addAttribute("list", list);
-            return "MemberList";
+            return "redirect:/memberList";
         }
     }
 }
